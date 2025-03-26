@@ -19,7 +19,13 @@ async function main() {
 	console.log("Starting Amazon coupon scraper...");
 
 	const browser = await puppeteer.launch({
-		headless: false, // Set to true for production
+		headless: false,
+		executablePath:
+			process.env.CHROME_PATH ||
+			"C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe",
+		userDataDir:
+			process.env.CHROME_USER_DATA_DIR ||
+			"C:\\Users\\dashi\\AppData\\Local\\Google\\Chrome\\User Data",
 		args: [
 			"--no-sandbox",
 			"--disable-setuid-sandbox",
@@ -27,8 +33,12 @@ async function main() {
 			"--disable-accelerated-2d-canvas",
 			"--disable-gpu",
 			"--window-size=1920,1080",
+			"--font-render-hinting=none",
+			"--lang=ja-JP,ja",
+			"--profile-directory=Default",
 		],
 		defaultViewport: null,
+		ignoreDefaultArgs: ["--enable-automation"],
 	});
 
 	try {
@@ -47,6 +57,16 @@ async function main() {
 			"Accept-Encoding": "gzip, deflate, br",
 			Connection: "keep-alive",
 			"Upgrade-Insecure-Requests": "1",
+		});
+
+		await page.evaluateOnNewDocument(() => {
+			const style = document.createElement("style");
+			style.textContent = `
+        * {
+          font-family: "Noto Sans CJK JP", "Noto Sans JP", "Meiryo", "MS PGothic", sans-serif !important;
+        }
+      `;
+			document.head.appendChild(style);
 		});
 
 		// The simplified URL with coupon and 50%+ discount filters
@@ -97,8 +117,7 @@ async function extractProducts(page: Page): Promise<Product[]> {
 			try {
 				const productUrl = item.querySelector("a")?.getAttribute("href") || "";
 				products.push({ productUrl });
-			} catch (error) {
-				console.error("Error extracting product data:", error);
+			} catch (error) { console.error("Error extracting product data:", error);
 			}
 		}
 
