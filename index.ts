@@ -22,7 +22,7 @@ async function main() {
 		headless: false,
 		executablePath:
 			process.env.CHROME_PATH ||
-			"C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe",
+			"C:/Program Files/Google/Chrome/Application/chrome.exe",
 		userDataDir:
 			process.env.CHROME_USER_DATA_DIR ||
 			"C:\\Users\\dashi\\AppData\\Local\\Google\\Chrome\\User Data",
@@ -117,7 +117,8 @@ async function extractProducts(page: Page): Promise<Product[]> {
 			try {
 				const productUrl = item.querySelector("a")?.getAttribute("href") || "";
 				products.push({ productUrl });
-			} catch (error) { console.error("Error extracting product data:", error);
+			} catch (error) {
+				console.error("Error extracting product data:", error);
 			}
 		}
 
